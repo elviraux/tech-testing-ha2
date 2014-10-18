@@ -2,116 +2,110 @@ __author__ = 'Elvira'
 
 import unittest
 from selenium.webdriver import  DesiredCapabilities, Remote
-from locators import locators
-
-class ResultPage(object):
-    def __init__(self, driver):
-        self.driver = driver
-
-    def result(self):
-        return self.driver.find_element_by_class_name('campaign-title__name').text
+import os
+#from selenium.webdriver.support.ui import Select, WebDriverWait
+from tests.Page.Page import CreateCompanyPage, CurrentPage, LoginPage
+from tests.Page.Component import WhereElement, WhomElement
 
 
-class CreateGroupPage(object):
-    CREATE = "toolbar__main-button"
-    COMPANY_NAME = "base-setting__campaign-name__input"
-    COMPANY_TYPE = "product-type-5212"
-    PLATFORM = "pad-mobile_odkl_feed_abstract"
-    TITLE = "//ul[@class_name='banner-form__list']/li[2]/input[1]"
-    DESCRIPTION = "//ul[@class_name='banner-form__list']/li[3]/textarea[1]"
-    TARGET = "//ul[@class_name='banner-form__list']/li[4]/span[2]/input[1]]"
-
-    IMAGE1 = ".banner-form__img-file"
-
-    def __init__(self, driver):
-        self.driver = driver
-
-    def get_result(self):
-        btn_create_company = self.driver.find_element_by_class_name(self.CREATE)
-        btn_create_company.click()
-
-        set_name = self.driver.find_element_by_class_name(self.COMPANY_NAME)
-        set_name.send_keys(locators['group_name'])
-
-        btn_choose_company_type = self.driver.find_element_by_id(self.COMPANY_TYPE)
-        btn_choose_company_type.click()
-
-        btn_choose_platform = self.driver.find_element_by_id(self.PLATFORM)
-        btn_choose_platform.click()
-
-        set_title = self.driver.find_element_by_xpath(self.TITLE)
-        set_title.send_keys("Header")
-
-        set_description = self.driver.find_element_by_xpath(self.DESCRIPTION)
-        set_description.send_keys("Text description blablabla")
-
-        set_target = self.driver.find_element_by_xpath(self.TARGET)
-        set_target.send_keys("http://www.odnoklassniki.ru/target")
-
-        upload_min_img = self.driver.find_elements_by_class_name(self.IMAGE1)
-        upload_min_img.send_keys('tests/source/1.jpg')
-
-        upload_max_img = self.driver.find_element_by_xpath("//ul[@class_name='banner-form__list']/li[9]/form[1]/div[1]/input[1]")
-        upload_max_img.send_keys('tests/source/2.jpg')
-
-        btn_push = self.driver.find_element_by_xpath("//div[@class_name='banner-form__footer']/input[1]")
-        btn_push.click()
-    
-        btn_choose_frame_age = self.driver.find_element_by_id("restrict-0+")
-        btn_choose_frame_age.click()
-
-        btn_choose_place = self.driver.find_element_by_xpath("ul[@id='campaign-setting__preset-list]/li[1]")
-        btn_choose_place.click()
-
-        btn_done_all = self.driver.find_element_by_class_name("main-button-new")
-        btn_done_all.click()
-
-        return ResultPage(self.driver).result()
-
-
-class LoginPage(object):
-    def __init__(self, driver):
-        self.driver = driver
-
-    def login(self, login, domain, password):
-        self.driver.find_element_by_id("PH_authLink").click()
-        self.driver.find_element_by_id("id_Login").send_keys(login)
-        self.driver.find_element_by_id("id_Domain").send_keys(domain)
-        self.driver.find_element_by_id("id_Password").send_keys(password)
-        self.driver.find_element_by_xpath("//p[@id='gogogo']/input[1]").click()
-        return CreateGroupPage(self.driver)
-
-class CreateGroup(object):
-    def __init__(self, driver):
-        self.driver = driver
-
-    def get_result(self):
-        loginPage = LoginPage(self.driver)
-        MakeGroupPage = loginPage.login(locators['login'], locators['domain'], locators['password'])
-        result = MakeGroupPage.get_result()
-        return result
 
 
 class TestTarget(unittest.TestCase):
 
     def setUp(self):
+        LOGIN = 'tech-testing-ha2-9'
+        DOMAIN ='@bk.ru'
+        PASSWORD = os.environ.get('TTHA2PASSWORD')
+
         self.driver = Remote(
-            desired_capabilities = DesiredCapabilities.CHROME.copy()
+            desired_capabilities = DesiredCapabilities.FIREFOX.copy()
         )
         self.driver.get("https://target.mail.ru")
         self.driver.implicitly_wait(30)
+        auth_page = LoginPage(self.driver)
+        auth_page.open()
+        auth_form = auth_page.form()
+        auth_form.set_login(LOGIN)
+        auth_form.set_domain(DOMAIN)
+        auth_form.set_password(PASSWORD)
+        auth_form.submit()
+
+   #def tearDown(self):
+        #self.driver.close()
+    """
+    def test_login(self):
+        LOGIN = 'tech-testing-ha2-9'
+        DOMAIN ='@bk.ru'
+        EMAIL = LOGIN + DOMAIN
+        curr_page = CurrentPage(self.driver)
+        curr_page.open()
+        top_email = curr_page.top_menu()
+        email = top_email.get_email().text
+        assert EMAIL in email
+    """
+
+    def test_create(self):
+        COMPANY_NAME ="Sunny"
+
+        create_page = CreateCompanyPage(self.driver)
+        create_page.open()
+        base_settings = create_page.base_form()
+        base_settings.set_name(COMPANY_NAME)
+        base_settings.choose_company_type()
+        base_settings.choose_platform()
+
+        whom_settings = create_page.whom_form()
+        whom_settings.choose_restrict()
 
 
-    def tearDown(self):
-        self.driver.close()
-
-    def test_create_group(self):
-        home = CreateGroup(self.driver)
-        result = home.get_result()
-        assert locators['group_name'] in result
+   # def test_restrict(self):
 
 
+"""
+    #def test(self):
 
+
+        COMPANY_NAME ="Sunny"
+        HEADER = "Header"
+        DESCRIPTION = "Description"
+        TARGET = "http://www.odnoklassniki.ru/target"
+        IMG1 = 'tests/source/1.jpg'
+        IMG2 = 'tests/source/2.jpg'
+
+
+        current_page = CurrentPage(self.driver)
+        create_page = CreateCompanyPage(self.driver)
+        email = create_page.top_menu.get_email()
+
+        create_form = create_page.create_form()
+        create_form.create()
+        create_form.set_name(COMPANY_NAME)
+        create_form.choose_company_type()
+        create_form.choose_platform()
+
+
+      #  create_form.set_title(HEADER)
+        #create_form.set_description(DESCRIPTION)
+       # create_form.set_target(TARGET)
+        #create_form.upload_min_img(IMG1)
+        #create_form.upload_max_img(IMG2)
+        create_form.choose_restrict()
+       # create_form.choose_place()
+        place_list  = WebDriverWait(self.driver, 30, 1).until(
+            lambda d: d.find_element_by_css_selector('[data_name=where]')
+        )
+
+
+
+
+
+
+
+
+    #def test_create(self):
+        #create_page = CreateCompanyPage(self.driver)
+
+"""
 
 if __name__ == "__main__":
     unittest.main()
