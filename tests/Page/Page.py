@@ -1,7 +1,7 @@
 __author__ = 'Elvira'
 
 import urlparse
-from tests.Page.Component import TopMenu, BaseSettingsElement, LoginForm, BannerElement, WhereElement, WhomElement
+from tests.Page.Component import TopMenu, BaseSettingsElement, LoginForm, BannerElement, WhereElement, WhomElement, SubmitButtonForm, Company, EditForm
 
 
 class Page(object):
@@ -19,13 +19,18 @@ class Page(object):
 class LoginPage(Page):
     PATH = '/login'
 
+    @property
     def form(self):
         return LoginForm(self.driver)
 
 class CurrentPage(Page):
     PATH = 'ads/campaigns/'
 
+    @property
+    def company(self):
+        return Company(self.driver)
 
+    @property
     def top_menu(self):
         return TopMenu(self.driver)
 
@@ -33,15 +38,15 @@ class CurrentPage(Page):
 class CreateCompanyPage(Page):
     PATH = 'ads/create/'
 
-
+    @property
     def top_menu(self):
         return TopMenu(self.driver)
 
-
+    @property
     def base_form(self):
         return BaseSettingsElement(self.driver)
 
-
+    @property
     def banner_form(self):
         return BannerElement(self.driver)
 
@@ -52,3 +57,16 @@ class CreateCompanyPage(Page):
     @property
     def where_form(self):
         return WhereElement(self.driver)
+
+    @property
+    def submit_form(self):
+        return SubmitButtonForm(self.driver)
+
+
+class EditPage(Page):
+
+    @property
+    def edit_form(self):
+        return EditForm(self.driver)
+
+
