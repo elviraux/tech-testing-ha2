@@ -1,18 +1,17 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 __author__ = 'Elvira'
 
 import unittest
-from selenium.webdriver import  DesiredCapabilities, Remote
+from selenium.webdriver import DesiredCapabilities, Remote
 import os
 from tests.Page import create_company, delete_company
 from tests.Page.Page import CreateCompanyPage, CurrentPage, LoginPage, EditPage
 
 
-
 class TestTarget(unittest.TestCase):
     LOGIN = 'tech-testing-ha2-9'
-    DOMAIN ='@bk.ru'
+    DOMAIN = '@bk.ru'
     PASSWORD = os.environ.get('TTHA2PASSWORD')
 
     def setUp(self):
@@ -34,7 +33,7 @@ class TestTarget(unittest.TestCase):
     def tearDown(self):
         if self.created:
             delete_company(self.driver)
-        self.driver.close()
+        self.driver.quit()
 
 
     def test_login(self):
@@ -65,7 +64,6 @@ class TestTarget(unittest.TestCase):
         assert RUS in where_settings.get_chosen()
 
 
-
     def test_restrict(self):
         RESTRICT = u'12+'
         create_page = CreateCompanyPage(self.driver)
@@ -76,14 +74,13 @@ class TestTarget(unittest.TestCase):
         self.assertEquals(RESTRICT, restrict)
 
     def test_create(self):
-        COMPANY_NAME ="Sunny"
+        COMPANY_NAME = "Sunny"
 
         create_company(self.driver)
         self.created = True
         current_page = CurrentPage(self.driver)
         current_form = current_page.company
         assert COMPANY_NAME in current_form.get_title()
-
 
 
     def test_restrict_final(self):
@@ -97,7 +94,6 @@ class TestTarget(unittest.TestCase):
         edit_form = EditPage(self.driver).edit_form
         restrict = edit_form.get_restrict()
         self.assertEquals(RESTRICT, restrict)
-
 
 
 if __name__ == "__main__":

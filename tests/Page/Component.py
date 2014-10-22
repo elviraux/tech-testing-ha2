@@ -1,3 +1,4 @@
+# coding=utf-8
 __author__ = 'Elvira'
 
 from selenium.webdriver.support.ui import WebDriverWait
@@ -192,15 +193,20 @@ class BaseSettingsElement(Component):
 
 
 class WhomElement(Component):
-    RESTRICT = '.campaign-setting__wrapper_restrict'
     SHOW_RESTRICT = '[data-node-id=restrict]'
     RESTRICT12 = 'restrict-12+'
+    ALL_SETTINGS_BODY ='.all-settings__body'
+    ALL_SETTINGS = '.all-settings'
+    WHOM = '[data-name="whom"]'
+    RESTRICT_NAME = '[data-name="restrict"]'
 
     def choose_restrict(self):
-        restrict = self.wait(self.driver, self.RESTRICT)
-        restrict.find_element_by_css_selector(self.SHOW_RESTRICT).click()
+        self.wait(self.driver, self.ALL_SETTINGS)
+        self.wait(self.driver, self.WHOM)
+        self.wait(self.driver, self.ALL_SETTINGS_BODY)
+        self.wait(self.driver, self.RESTRICT_NAME)
+        self.wait(self.driver, self.SHOW_RESTRICT).click()
         self.wait_id(self.RESTRICT12).click()
-
 
     def get_restrict(self):
         restrict = WebDriverWait(self.driver, 30, 0.5).until(
